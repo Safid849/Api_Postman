@@ -21,7 +21,23 @@ def read_hello(request: Request, name: str = None, is_teacher: bool = False):
     else:
         return JSONResponse({"message": f"Hello {name}"}, status_code=200)
 
-@app.put("/secret")
+
+@app.put("/top-secret")
+def top_secret(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if auth_header is None:
+        return JSONResponse(
+            {
+                "error": "Forbidden",
+                "detail": "No key provided."
+            },
+            status_code=403
+        )
+    if auth_header != "Zinedis_secret-key":
+        return JSONResponse({"error": "Forbbiden", "Provide_key": auth_header}, status_code=403)
+
+    return JSONResponse({"message": "Welcome, authentication succeeded!"}, status_code=200)
+
 
 class WelcomeRequest(BaseModel):
     name: str
